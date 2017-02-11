@@ -1,0 +1,9 @@
+== README
+
+Following steps are necessary to get the script up and running.
+
+* Open terminal and run the following commands
+
+<tt>git clone https://github.com/rokibulhassan/BigFiveTest.git</tt>
+<tt>cd BigFiveTest</tt>
+<tt>ruby big_five_results_text_serializer.rb</tt>
