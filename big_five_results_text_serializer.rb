@@ -19,13 +19,19 @@ class String
   def segment?
     true if self['Domain/Facet............ Score']
   end
+
+  def success?
+    self == '201'
+  end
 end
 
 class BigFiveResultsTextSerializer
+  attr_reader :result
+
   def initialize(file)
     @contents = file
-    @score_key = 'Facets'
-    @facets_key = 'Overall Score'
+    @facets_key = 'Facets'
+    @score_key = 'Overall Score'
     @result = {'NAME' => 'Rokibul Hasan'}
   end
 
@@ -41,7 +47,6 @@ class BigFiveResultsTextSerializer
         line.facet? ? facets.merge!({domain => score}) : @result.merge!({domain => {@score_key => score, @facets_key => facets}})
       end
     end
-    @result
   end
 end
 
@@ -61,17 +66,19 @@ class BigFiveResultsPoster
     request.body = @result.to_json
     response = https.request(request)
 
-    puts(response.body)
+    @response_code = response.code
+    @token = response.body if @response_code.success?
   end
 end
 
 file = File.open("BigFiveTest.txt")
 object = BigFiveResultsTextSerializer.new(file)
-result = object.serialize
+object.serialize
 
-puts "My result :: #{result}"
-
-poster = BigFiveResultsPoster.new(result)
+poster = BigFiveResultsPoster.new(object.result)
 poster.perform
+
+puts "My result :: #{object.result}\n\n"
+puts "Response code :: #{poster.response_code} and Token :: #{poster.token}\n\n"
 
 
